@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Dashboard</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+    .dashboard-box {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.15);
+      padding: 30px;
+      width: 100%;
+      max-width: 1250px;
+      animation: fadeIn 1s ease-in-out;
+    }
+   .dashboard-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 20px 25px;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+    animation: fadeIn 0.8s ease-in-out;
+  }
+
+  #greeting {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+  }
+
+  .dashboard-header .actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .search-box {
+    position: relative;
+    flex: 1;
+    max-width: 280px;
+  }
+
+  .search-box input {
+    border-radius: 50px;
+    padding: 10px 40px 10px 18px;
+    border: 1px solid #ddd;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s ease-in-out;
+  }
+
+  .search-box input:focus {
+    border-color: #66a6ff;
+    box-shadow: 0 0 8px rgba(102,166,255,0.3);
+    outline: none;
+  }
+
+  .search-box i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #777;
+    font-size: 1rem;
+  }
+
+  .btn-add-task {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 22px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Icon styling */
+  .btn-add-task .btn-icon {
+    background: rgba(255, 255, 255, 0.25);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    transition: transform 0.3s ease, background 0.3s ease;
+  }
+
+  /* Hover / Focus effect */
+  .btn-add-task:hover {
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
+    box-shadow: 0px 6px 16px rgba(56, 249, 215, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .btn-add-task:hover .btn-icon {
+    transform: rotate(180deg) scale(1.1);
+    background: rgba(255, 255, 255, 0.35);
+  }
+
+  /* Smooth click effect */
+  .btn-add-task:active {
+    transform: scale(0.97);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .task-summary {
+    background: linear-gradient(135deg, #ffffff, #f1f7ff);
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease-in-out;
+  }
+
+  .task-summary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+  }
+
+  .task-summary h4 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #333;
+  }
+
+  .task-summary p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #666;
+  }
+
+  .progress {
+    height: 10px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    transition: width 0.6s ease-in-out;
+  }
+
+  .task-summary .icon {
+    font-size: 1.8rem;
+    color: #28a745;
+    margin-bottom: 8px;
+  }
+
+   #loadMoreBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 25px;
+    z-index: 1050;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    border-radius: 30px;
+    background: #fff;
+    border: 2px solid #0d6efd;
+    color: #0d6efd;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease-in-out;
+  }
+
+  #loadMoreBtn:hover {
+    background: #0d6efd;
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(13,110,253,0.3);
+    transform: translateY(-2px);
+  }
+
+  #loadMoreBtn:active {
+    transform: scale(0.95);
+  }
+    .task-column {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+      min-height: 350px;
+      transition: transform 0.3s ease;
+    }
+    .task-column:hover { transform: translateY(-5px); }
+    .task-column h4 {
+      font-weight: 600;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+      color: #fff;
+    }
+    .pending-header    { background: linear-gradient(135deg, #ffe082, #ffca28); color: #5d4037; }
+    .processing-header { background: linear-gradient(135deg, #90caf9, #42a5f5); color: #0d47a1; }
+    .completed-header  { background: linear-gradient(135deg, #a5d6a7, #66bb6a); color: #1b5e20; }
+    .priority-badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; }
+    .priority-high   { background: #ffcdd2; color: #b71c1c; }
+    .priority-medium { background: #fff9c4; color: #f57f17; }
+    .priority-low    { background: #c8e6c9; color: #1b5e20; }
+    @keyframes fadeIn { from {opacity:0;transform:scale(0.95);} to {opacity:1;transform:scale(1);} }
+
+    #confirmDeleteModal .modal-dialog {
+  margin-top: 20px; /* Adjust as needed */
+}
+
+  </style>
+</head>
+<body>
+
+<!-- Toast -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index:1055;">
+  <% if (success) { %>
+    <div id="successToast" class="toast align-items-center border-0 show" role="alert" aria-live="assertive" aria-atomic="true" 
+         style="background: linear-gradient(135deg, #a5d6a7, #66bb6a); color: #1b5e20;">
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="bi bi-check-circle me-2"></i> <%= success %>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  <% } %>
+</div>
+
+<div class="position-fixed top-0 end-0 p-3" style="z-index:1055;">
+  <div id="updateToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true" 
+       style="background: linear-gradient(135deg, #a5d6a7, #66bb6a); color: #1b5e20;">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i class="bi bi-check-circle me-2"></i> Task Upadted Successfully! 🎉
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+
+<div class="dashboard-box">
+  <!-- Header -->
+
+ <div class="dashboard-header">
+  <h2 id="greeting">Welcome, <%= user_info[0].user_name %> 👋</h2>
+  <div class="actions">
+    <div class="search-box">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search tasks...">
+      <i class="bi bi-search"></i>
+    </div>
+    <button class="btn btn-add-task shadow-sm" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+  <span class="btn-icon">+</span> Add Task
+</button>
+  </div>
+</div>
+
+<!-- ✅ Task Summary -->
+<div class="mb-4">
+  <% let totalTasks = pending_tasks.length + progress_tasks.length + completed_tasks.length; %>
+  <% let completedCount = completed_tasks.length; %>
+  
+  <div class="task-summary card p-4 shadow-lg border-0 rounded-4 text-center">
+    <div class="d-flex align-items-center justify-content-center mb-2">
+      <div class="summary-icon me-2">
+        <i class="bi bi-clipboard-check-fill"></i>
+      </div>
+      <h4 class="mb-0 fw-bold text-dark">
+        <%= completedCount %>/<%= totalTasks %> Tasks Completed
+      </h4>
+    </div>
+    <p class="text-muted mb-3">Great progress! Keep going 🚀</p>
+
+    <!-- ✅ Smooth Progress Bar -->
+   <% const progressPct = totalTasks ? Math.round((completedCount / totalTasks) * 100) : 0; %>
+
+    <div class="progress" style="height: 12px; border-radius: 20px; overflow: hidden;">
+      <div
+        class="progress-bar bg-success bg-gradient"
+        role="progressbar"
+        style="width:<%= progressPct %>%; transition: width 1s ease;"
+        aria-valuenow="<%= progressPct %>"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-label="Completed tasks"
+      ></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 3 Columns -->
+<div class="row g-4 task-list">
+
+  <!-- Pending -->
+  <div class="col-md-4">
+    <div class="task-column">
+      <h4 class="pending-header">📌 Pending</h4>
+      <% pending_tasks.forEach((task,i)=>{ %>
+        <div class="d-flex justify-content-between align-items-center border-bottom py-1 task-item">
+          <span>
+            <%= i+1 %>. <%= task.task_title %> 
+            <span class="priority-badge priority-<%= task.task_priority.toLowerCase() %>">
+              <%= task.task_priority %>
+            </span>
+          </span>
+          <div class="dropdown">
+            <a class="text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="/start_task/<%= task.task_id %>">
+                  <ion-icon name="play-outline"></ion-icon> Start Task
+                </a>
+              </li>
+              <li>
+                <!-- Edit opens modal with task info -->
+                <a class="dropdown-item" href="#" 
+                   data-bs-toggle="modal" data-bs-target="#editTaskModal"
+                   data-id="<%= task.task_id %>"
+                   data-title="<%= task.task_title %>"
+                   data-desc="<%= task.task_description %>"
+                   data-priority="<%= task.task_priority %>">
+                  <ion-icon name="pencil-outline"></ion-icon> Edit
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item text-danger"
+                    href="#"
+                    data-bs-toggle="modal"
+                    data-bs-target="#confirmDeleteModal"
+                    data-task-id="<%= task.task_id %>">
+                    <ion-icon name="trash-outline"></ion-icon> Remove
+                  </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      <% }) %>
+      <% if(pending_tasks.length === 0){ %>
+        <p class="text-muted">No Pending Tasks.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Processing -->
+  <div class="col-md-4">
+    <div class="task-column">
+      <h4 class="processing-header">⚙️ Processing</h4>
+      <% progress_tasks.forEach((task,i)=>{ %>
+        <div class="d-flex justify-content-between align-items-center border-bottom py-1 task-item">
+          <span>
+            <%= i+1 %>. <%= task.task_title %>
+            <span class="priority-badge priority-<%= task.task_priority.toLowerCase() %>">
+              <%= task.task_priority %>
+            </span>
+          </span>
+          <div class="dropdown">
+            <a class="text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="/end_task/<%= task.task_id %>">
+                  <ion-icon name="stop-circle-outline"></ion-icon> End Task
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="/back_to_pending/<%= task.task_id %>">
+                  <ion-icon name="play-outline"></ion-icon> Back To Pending
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" 
+                   data-bs-toggle="modal" data-bs-target="#editTaskModal"
+                   data-id="<%= task.task_id %>"
+                   data-title="<%= task.task_title %>"
+                   data-desc="<%= task.task_description %>"
+                   data-priority="<%= task.task_priority %>">
+                  <ion-icon name="pencil-outline"></ion-icon> Edit
+                </a>
+              </li>
+              <li>
+               <a class="dropdown-item text-danger"
+                  href="#"
+                  data-bs-toggle="modal"
+                  data-bs-target="#confirmDeleteModal"
+                  data-task-id="<%= task.task_id %>">
+                  <ion-icon name="trash-outline"></ion-icon> Remove
+                </a>
+
+              </li>
+            </ul>
+          </div>
+        </div>
+      <% }) %>
+      <% if(progress_tasks.length==0){ %>
+        <p class="text-muted">No Processing Tasks.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Completed -->
+  <div class="col-md-4">
+    <div class="task-column">
+      <h4 class="completed-header">✅ Completed</h4>
+      <% completed_tasks.forEach((task,i)=>{ %>
+        <div class="d-flex justify-content-between align-items-center border-bottom py-1 task-item">
+          <span>
+            <%= i+1 %>. <%= task.task_title %>
+            <span class="priority-badge priority-<%= task.task_priority.toLowerCase() %>">
+              <%= task.task_priority %>
+            </span>
+          </span>
+          <div class="dropdown">
+            <a class="text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="/back_to_pending/<%= task.task_id %>">
+                  <ion-icon name="play-outline"></ion-icon> Back To Pending
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="/back_to_processing/<%= task.task_id %>">
+                  <ion-icon name="refresh-outline"></ion-icon> Back To Processing
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" 
+                   data-bs-toggle="modal" data-bs-target="#editTaskModal"
+                   data-id="<%= task.task_id %>"
+                   data-title="<%= task.task_title %>"
+                   data-desc="<%= task.task_description %>"
+                   data-priority="<%= task.task_priority %>">
+                  <ion-icon name="pencil-outline"></ion-icon> Edit
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item text-danger"
+                  href="#"
+                  data-bs-toggle="modal"
+                  data-bs-target="#confirmDeleteModal"
+                  data-task-id="<%= task.task_id %>">
+                  <ion-icon name="trash-outline"></ion-icon> Remove
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      <% }) %>
+      <% if(completed_tasks.length==0){ %>
+        <p class="text-muted">No Completed Tasks.</p>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add Task Modal -->
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <form action="/add_task" method="post">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold text-dark" id="addTaskLabel">
+            <i class="bi bi-plus-circle me-2 text-success"></i> Add New Task
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body px-4">
+          <!-- Task Title -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Task Title</label>
+            <input type="text" name="task_title" class="form-control rounded-3 shadow-sm" placeholder="Enter task title" required>
+          </div>
+
+          <!-- Task Description -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Description</label>
+            <textarea name="task_description" class="form-control rounded-3 shadow-sm" rows="3" placeholder="Enter task details"></textarea>
+          </div>
+
+          <!-- Task Priority -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Priority</label>
+            <select name="task_priority" class="form-select rounded-3 shadow-sm" required>
+              <option value="" disabled selected>-- Select --</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+
+          <!-- Entry Date -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Entry Date</label>
+            <input type="date" name="task_entry_date" class="form-control rounded-3 shadow-sm" required>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-light px-4 rounded-3" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success px-4 rounded-3">Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Task Modal -->
+<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <form action="/update_task" method="post">
+        <input type="hidden" name="task_id" id="editTaskId">
+
+        <!-- Modal Header -->
+        <div class="modal-header bg-light border-0 rounded-top-4 px-4 py-3">
+          <h5 class="modal-title fw-bold text-primary d-flex align-items-center" id="editTaskLabel">
+            ✏️ <span class="ms-2">Edit Task</span>
+          </h5>
+          <button type="button" class="btn-close shadow-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+
+
+        <div class="modal-body px-4">
+          <!-- Task Title -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Task Title</label>
+            <input type="text" name="task_title" id="editTaskTitle" class="form-control rounded-3 shadow-sm" placeholder="Enter task title" required>
+          </div>
+
+          <!-- Task Description -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Description</label>
+            <textarea name="task_description" id="editTaskDesc" class="form-control rounded-3 shadow-sm" rows="3" placeholder="Enter task details"></textarea>
+          </div>
+
+          <!-- Task Priority -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Priority</label>
+            <select name="task_priority" id="editTaskPriority" class="form-select rounded-3 shadow-sm" required>
+              <option value="" disabled>-- Select --</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-light px-4 rounded-3" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary px-4 rounded-3">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+  <div class="modal-dialog mt-5"> <!-- Removed modal-dialog-centered -->
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header bg-light border-0 rounded-top-4 px-4 py-3">
+        <h5 class="modal-title fw-bold text-danger d-flex align-items-center" id="confirmDeleteLabel">
+          ⚠️ Confirm Delete
+        </h5>
+        <button type="button" class="btn-close shadow-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center px-4 py-3">
+        <p class="mb-0 fs-6">Are you sure you want to remove this task?</p>
+      </div>
+      <div class="modal-footer border-0 px-4 pb-3">
+        <button type="button" class="btn btn-secondary rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
+        <a id="confirmDeleteBtn" href="#" class="btn btn-danger rounded-3 px-4">Yes, Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Ionicons (include once only) -->
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script>
+ // Autofill modal fields with task data
+  const editTaskModal = document.getElementById('editTaskModal');
+  editTaskModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    document.getElementById('editTaskId').value = button.getAttribute('data-id');
+    document.getElementById('editTaskTitle').value = button.getAttribute('data-title');
+    document.getElementById('editTaskDesc').value = button.getAttribute('data-desc');
+    document.getElementById('editTaskPriority').value = button.getAttribute('data-priority');
+  });
+
+  // ✅ Toast
+  const toastEl=document.getElementById('successToast');
+  if(toastEl){ new bootstrap.Toast(toastEl,{delay:3000}).show(); }
+
+  // ✅ Greeting
+  const greetEl=document.getElementById("greeting");
+  if(greetEl){
+    const hour=new Date().getHours();
+    let greet="Hello";
+    if(hour<12) greet="Good Morning";
+    else if(hour<18) greet="Good Afternoon";
+    else greet="Good Evening";
+    greetEl.innerHTML=`${greet}, <%= user_info[0].user_name %> 👋`;
+  }
+
+  // ✅ Search
+  const searchInput=document.getElementById("searchInput");
+  if(searchInput){
+    searchInput.addEventListener("keyup",function(){
+      let filter=this.value.toLowerCase();
+      document.querySelectorAll(".task-item").forEach(item=>{
+        item.style.display=item.textContent.toLowerCase().includes(filter)? "":"none";
+      });
+    });
+  }
+
+  // ✅ Load More Pagination
+  const loadBtn=document.getElementById("loadMoreBtn");
+  if(loadBtn){
+    const itemsPerPage=5;
+    let currentPage=1;
+    function showPage(){
+      document.querySelectorAll(".task-item").forEach((item,idx)=>{
+        item.style.display=(idx<currentPage*itemsPerPage)?"":"none";
+      });
+    }
+    loadBtn.addEventListener("click",()=>{ currentPage++; showPage(); });
+    showPage();
+
+    // Show/Hide button on scroll
+    window.addEventListener("scroll",()=>{
+      loadBtn.style.display=window.scrollY>200?"block":"none";
+    });
+  }
+</script>
+<script>
+  // Pass correct task_id into modal confirm button
+  const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+  confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget; // The delete link clicked
+    const taskId = button.getAttribute('data-task-id');
+    const confirmBtn = confirmDeleteModal.querySelector('#confirmDeleteBtn');
+    confirmBtn.href = `/remove_task/${taskId}`;
+  });
+</script>
+
+</body>
+</html>

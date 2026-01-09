@@ -6,10 +6,10 @@ var session = require("express-session");
 require("dotenv").config();
 
 var conn = mysql.createConnection({
-    host:"btpx4g4ghtlenyjc8yxr-mysql.services.clever-cloud.com",
-    user:"uqpqntukkfjjdarl",
-    password:"mMs8A8FkHrVJQvEFw7tT",
-    database:"btpx4g4ghtlenyjc8yxr"
+    host:"bcud1wbatfbojflwrlvu-mysql.services.clever-cloud.com",
+    user:"uvbyu4fhi0f9aus0",
+    password:"VBLt9v1rLwuvjpQVwBj1",
+    database:""bcud1wbatfbojflwrlvu
 });
 
 var exe = util.promisify(conn.query).bind(conn);
